@@ -1,0 +1,148 @@
+
+
+## **🚀 DFS (Depth First Search) – Grid**
+
+```cpp
+int R, C;
+char grid[50][50];
+bool visited[50][50];
+int dx[4] = {-1, 0, 0, 1};
+int dy[4] = {0, -1, 1, 0};
+
+void dfs(int x, int y) {
+    visited[x][y] = true;
+    for (int d=0; d<4; d++) {
+        int nx = x + dx[d], ny = y + dy[d];
+        if (nx>=0 && ny>=0 && nx<R && ny<C &&
+            !visited[nx][ny] && grid[nx][ny] != '#') {
+            dfs(nx, ny);
+        }
+    }
+}
+```
+
+✅ **Use for:** Connected components, path existence, flood fill.
+
+---
+
+## **🚀 BFS (Breadth First Search) – Shortest Path in Grid**
+
+```cpp
+#include <queue>
+int dist[50][50];
+queue<pair<int,int>> q;
+
+void bfs(int sx, int sy) {
+    dist[sx][sy] = 0;
+    q.push({sx, sy});
+    while (!q.empty()) {
+        auto [x, y] = q.front(); q.pop();
+        for (int d=0; d<4; d++) {
+            int nx = x + dx[d], ny = y + dy[d];
+            if (nx>=0 && ny>=0 && nx<R && ny<C &&
+                dist[nx][ny] == -1 && grid[nx][ny] != '#') {
+                dist[nx][ny] = dist[x][y] + 1;
+                q.push({nx, ny});
+            }
+        }
+    }
+}
+```
+
+✅ **Use for:** Minimum steps in unweighted grid.
+
+---
+
+## **🚀 Floyd–Warshall – All Pairs Shortest Path**
+
+```cpp
+int dist[20][20], V;
+void floydWarshall() {
+    for (int k=0; k<V; k++)
+        for (int i=0; i<V; i++)
+            for (int j=0; j<V; j++)
+                if (dist[i][k] + dist[k][j] < dist[i][j])
+                    dist[i][j] = dist[i][k] + dist[k][j];
+}
+```
+
+✅ **Use for:** Small graph (V ≤ 200), all-pairs shortest paths.
+
+---
+
+## **🚀 Dijkstra – Single Source Shortest Path**
+
+```cpp
+const int INF = 1e9;
+int dist[100], V;
+bool vis[100];
+int adj[100][100]; // or adjacency list
+
+void dijkstra(int src) {
+    for (int i=0; i<V; i++) dist[i] = INF;
+    dist[src] = 0;
+    for (int c=0; c<V; c++) {
+        int u = -1;
+        for (int i=0; i<V; i++)
+            if (!vis[i] && (u==-1 || dist[i] < dist[u])) u = i;
+        vis[u] = true;
+        for (int v=0; v<V; v++)
+            if (adj[u][v] && dist[u] + adj[u][v] < dist[v])
+                dist[v] = dist[u] + adj[u][v];
+    }
+}
+```
+
+✅ **Use for:** Single source, positive weights.
+
+---
+
+## **🚀 Bitmask DP – TSP (e.g. Kim & Refrigerator)**
+
+```cpp
+int N;
+int dist[12][12]; // precomputed distances
+int dp[12][1<<12]; // dp[pos][mask]
+const int INF = 1e9;
+
+int tsp(int pos, int mask) {
+    if (mask == (1<<N)-1) return dist[pos][N+1]; // back to home
+    int &res = dp[pos][mask];
+    if (res != -1) return res;
+    res = INF;
+    for (int nxt=0; nxt<N; nxt++) {
+        if (!(mask & (1<<nxt))) {
+            res = min(res,
+                dist[pos][nxt] + tsp(nxt, mask | (1<<nxt)));
+        }
+    }
+    return res;
+}
+```
+
+✅ **Use for:** Visiting all nodes with min cost, N ≤ 15.
+
+---
+
+## **🚀 Manhattan Distance Formula**
+
+```cpp
+int manhattan(int x1, int y1, int x2, int y2) {
+    return abs(x1 - x2) + abs(y1 - y2);
+}
+```
+
+✅ **Use for:** Grid-based shortest distance without diagonals.
+
+---
+
+### 📌 Exam Tips:
+
+* Always **reset arrays** (`memset` or loops) between test cases.
+* For grid → BFS if shortest path, DFS if just existence/count.
+* For small N combinatorics → try bitmask DP or brute force with pruning.
+* For shortest paths with wormholes/teleports → model as a graph + Floyd-Warshall/Dijkstra.
+* For TSP-like → precompute `dist[i][j]` once.
+
+---
+
