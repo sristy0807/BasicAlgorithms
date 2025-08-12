@@ -1,0 +1,113 @@
+#include<iostream>
+#define MAX 100
+
+using namespace std;
+
+int grid[MAX][MAX];
+bool visited[MAX][MAX];
+
+int dir_x[4] = {-1,0,0,1};
+int dir_y[4] = { 0,-1,1,0 };
+
+int dir_x_8[8] = { -1,0,0,1,-1,-1,1,1 };
+int dir_y_8[8] = { 0,-1,1,0,-1,1,-1,1 };
+
+
+int r, c;
+
+int counter = 0;
+
+int chainLength;
+int longestChain;
+
+void DFS_longestChain(int x, int y) {
+	if (visited[x][y]) {
+		return;
+	}
+
+	visited[x][y] = true;
+
+	if (grid[x][y] == 1) {
+		chainLength++;
+
+		for (int i = 0; i < 8; i++) {
+			int newX = x + dir_x_8[i];
+			int newY = y + dir_y_8[i];
+			if (newX < 0 || newX >= r || newY < 0 || newY >= c) {
+				continue;
+			}
+
+			if (grid[newX][newY] == 1) {
+				DFS_longestChain(newX,newY);
+			}
+		}
+
+		
+	}
+
+}
+
+
+//DFS connected regions
+void DFS(int x, int y) {
+	if (visited[x][y]) {
+		return;
+	}
+
+	visited[x][y] = true;
+
+	if (grid[x][y] != 1) {
+		return;
+	}
+
+	for (int i = 0; i < 4; i++) {
+		int newX = x + dir_x[i];
+		int newY = y + dir_y[i];
+
+		if (newX < 0 || newX >= r || newY < 0 || newY >= c) {
+			continue;
+		}
+
+		DFS(newX, newY);
+	}
+}
+
+
+int main() {
+	freopen("input.txt", "r", stdin);
+	cin >> r >> c;
+	for (int i = 0; i < r; i++) {
+		for (int j = 0; j < c; j++) {
+			cin >> grid[i][j];
+		}
+	}
+
+	
+
+	for (int i = 0; i < r; i++) {
+		for (int j = 0; j < c; j++) {
+			
+			if (grid[i][j] == 1 && !visited[i][j]) {
+				
+				chainLength = 0;
+				DFS_longestChain(i, j);
+
+				if (chainLength > longestChain) {
+					longestChain = chainLength;
+				}
+				/*
+				counter++;
+				DFS(i, j);
+				*/
+				
+			}
+			
+			
+		}
+	}
+
+	cout << "longest count " << longestChain <<endl;
+}
+
+
+	
